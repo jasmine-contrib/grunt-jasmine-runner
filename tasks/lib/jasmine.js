@@ -39,7 +39,8 @@ exports.buildSpecrunner = function(dir, options, reporters){
       source = grunt.util._.template(src, grunt.util._.extend({
         scripts : scripts,
         specs: specs,
-        css : styles
+        css : styles,
+        amd: options.amd || false
       }, specRunnerTemplate.opts));
       return source;
     }

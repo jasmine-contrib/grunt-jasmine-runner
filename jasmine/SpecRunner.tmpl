@@ -12,6 +12,11 @@
     <script type="text/javascript" src="/jasmine/lib/jasmine-core/jasmine.js"></script>
     <script type="text/javascript" src="/jasmine/lib/jasmine-core/jasmine-html.js"></script>
 -->
+
+    <script type="text/javascript">
+        window.amd = <%= amd %>;
+    </script>
+
     <% scripts.forEach(function(script){ %>
     <script type="text/javascript" src="<%= script %>"></script>
     <% }) %>
@@ -22,7 +27,9 @@
         <% specs.forEach(function(script, i){ %>
             '<%= script %>' <% if (i !== specs.length-1){ %>,<% } %>
         <% }) %>
-        ]);
+        ], function(){
+            execJasmine();
+        });
         </script>
     <% } %>
 </head>

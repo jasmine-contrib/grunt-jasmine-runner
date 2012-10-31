@@ -22,7 +22,9 @@ window.onload = function() {
   if (currentWindowOnload) {
     currentWindowOnload();
   }
-  execJasmine();
+  if(!window.amd){
+    execJasmine();
+  }
 };
 
 function execJasmine() {
