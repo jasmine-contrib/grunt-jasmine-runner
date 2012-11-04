@@ -30,8 +30,11 @@ exports.buildSpecrunner = function(dir, options, reporters){
     specRunnerTemplate = {src: options.template, opts: {}};
   }
 
-  if(!specRunnerTemplate.src){
-    specRunnerTemplate.src = __dirname + '/../jasmine/runners/'+((options.amd)?'Amd':'')+'SpecRunner.tmpl';
+  if(!specRunnerTemplate){
+    specRunnerTemplate = {
+      src : __dirname + '/../jasmine/runners/'+((options.amd)?'Amd':'')+'SpecRunner.tmpl',
+      opts: {}
+    };
   }
 
   grunt.file.copy(specRunnerTemplate.src, path.join(dir,tmpRunner), {

@@ -29,10 +29,7 @@ var baseDir = '.',
       specs   : [],
       src     : [],
       helpers : [],
-      template: {
-        src: null,
-        opts: {}
-      },
+      template: null,
       phantomjs : {}
 };
 
