@@ -102,5 +102,40 @@ exports['jasmine-runner'] = {
     }
 
     task.phantomRunner(config, cb);
+  },
+  'AMD dynamic generation': function(test) {
+    test.expect(4);
+    // tests here
+
+    var config = {
+      timeout : 10000,
+      specs   : 'test/fixtures/amd/specs/**/*.js',
+      amd     : true,
+      helpers : [
+        'test/fixtures/amd/libs/require.js',
+        'test/fixtures/amd/config.js'
+      ],
+      server  : {
+        port : 8888
+      },
+      junit : {
+        output : 'junit'
+      },
+      phantomjs : {
+        'ignore-ssl-errors' : true,
+        'local-to-remote-url-access' : true,
+        'web-security' : false
+      }
+    };
+
+    function cb(err,status){
+      test.equal(status.specs, 2, 'Found total specs from example');
+      test.equal(status.total, 2, 'Ran all specs from example');
+      test.equal(status.passed, 2, 'Passed all specs from example');
+      test.ok(!err, 'No error received');
+      test.done();
+    }
+
+    task.phantomRunner(config, cb);
   }
 };
