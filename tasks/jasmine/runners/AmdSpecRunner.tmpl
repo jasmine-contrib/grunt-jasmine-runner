@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <title>Jasmine AMD Spec Runner</title>
+
+    <% css.forEach(function(style){ %>
+    <link rel="stylesheet" type="text/css" href="<%= style %>">
+    <% }) %>
+
+    <% core.forEach(function(script){ %>
+    <script type="text/javascript" src="<%= script %>"></script>
+    <% }) %>
+
+    <script type="text/javascript">
+        require([
+        <% specs.forEach(function(script, i){ %>
+            '<%= script %>' <% if (i !== specs.length-1){ %>,<% } %>
+        <% }) %>
+        ], function(){
+            execJasmine();
+        });
+    </script>
+</head>
+
+<body>
+</body>
+</html>

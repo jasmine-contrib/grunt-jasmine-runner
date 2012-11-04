@@ -30,7 +30,7 @@ var baseDir = '.',
       src     : [],
       helpers : [],
       template: {
-        src: __dirname + '/../jasmine/SpecRunner.tmpl',
+        src: null,
         opts: {}
       },
       phantomjs : {}

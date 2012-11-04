@@ -19,33 +19,32 @@ exports.buildSpecrunner = function(dir, options, reporters){
   var phantomHelper = __dirname + '/../jasmine/phantom-helper.js';
   var jasmineHelper = __dirname + '/../jasmine/jasmine-helper.js';
 
-  var styles = getRelativeFileList(jasmineCss);
+  var styles  = getRelativeFileList(jasmineCss);
 
-  if (options.amd) {
-    var specs = getRelativeFileList(options.specs);
-    var scripts = getRelativeFileList(jasmineCore, options.helpers, phantomHelper, reporters, jasmineHelper);
-  } else {
-    var scripts = getRelativeFileList(jasmineCore, options.src, options.helpers, options.specs, phantomHelper, reporters, jasmineHelper);
+  var core  = getRelativeFileList(jasmineCore, options.helpers, phantomHelper, reporters, jasmineHelper);
+  var src   = getRelativeFileList(options.src);
+  var specs = getRelativeFileList(options.specs);
+
+  var specRunnerTemplate = options.template;
+  if(typeof specRunnerTemplate === 'string'){
+    specRunnerTemplate = {src: options.template, opts: {}};
   }
 
-  var specRunnerTemplate = typeof options.template === 'string' ? {
-    src: options.template,
-    opts: {}
-  } : options.template;
+  if(!specRunnerTemplate.src){
+    specRunnerTemplate.src = __dirname + '/../jasmine/runners/'+((options.amd)?'Amd':'')+'SpecRunner.tmpl';
+  }
 
-  var source;
   grunt.file.copy(specRunnerTemplate.src, path.join(dir,tmpRunner), {
-    process : function(src) {
-      source = grunt.util._.template(src, grunt.util._.extend({
-        scripts : scripts,
-        specs: specs,
+    process : function(tmpl) {
+      var source = grunt.util._.template(tmpl, grunt.util._.extend({
         css : styles,
-        amd: options.amd || false
+        core : core,
+        src: src,
+        specs: specs
       }, specRunnerTemplate.opts));
       return source;
     }
   });
-  return source;
 };
 
 
