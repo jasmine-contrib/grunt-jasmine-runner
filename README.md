@@ -23,9 +23,9 @@ grunt.loadNpmTasks('grunt-jasmine-runner');
   - timeout : The timeout where the tests are abandoned
   - template : Path to a custom template.
   - server :
-    - port : The port to start the server on, defaults to 8888
+     - port : The port to start the server on, defaults to 8888
   - junit :
-    - output : The output directory for junit xml
+     - output : The output directory for junit xml
   - phantomjs : A hash of options to pass to phantomjs eg {'ignore-ssl-errors' : true}
 
 - jasmine-server
