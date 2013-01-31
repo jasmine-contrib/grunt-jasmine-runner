@@ -75,6 +75,18 @@ describe("jasmine.Matchers", function() {
     expect((match(parseInt('5', 10)).toEqual(5))).toPass();
     expect((match(5).toNotEqual(5))).toFail();
     expect((match(parseInt('5', 10)).toNotEqual(5))).toFail();
+
+    expect((match(/1/i).toEqual(/1/i))).toPass();
+    expect((match(/1/i).toNotEqual(/1/i))).toFail();
+    expect((match(/[abc]/gm).toEqual(/1/i))).toFail();
+    expect((match(/[abc]/gm).toNotEqual(/1/i))).toPass();
+
+    // only test if the browser supports the sticky option on a regExp see pull #234
+    if (RegExp.prototype.sticky !== undefined) {
+      var sticky_regexp = new RegExp("[abc]", "y");
+      expect((match(sticky_regexp).toEqual(/1/i))).toFail();
+      expect((match(sticky_regexp).toNotEqual(/1/i))).toPass();
+    }
   });
 
   it("toEqual to build an Expectation Result", function() {
@@ -280,6 +292,29 @@ describe("jasmine.Matchers", function() {
     expect(result.message).toMatch('null');
     expect(result.actual).toEqual(actual);
   });
+
+	it("toBeNaN", function() {
+		expect(match(Number.NaN).toBeNaN()).toPass();
+		expect(match(0).toBeNaN()).toFail();
+		expect(match(1).toBeNaN()).toFail();
+		expect(match(null).toBeNaN()).toFail();
+		expect(match(Number.POSITIVE_INFINITY).toBeNaN()).toFail();
+		expect(match(Number.NEGATIVE_INFINITY).toBeNaN()).toFail();
+		expect(match('NaN').toBeNaN()).toFail();
+	});
+
+	it("toBeNaN to build an ExpectationResult", function() {
+		var actual = 'a';
+		var matcher = match(actual);
+		matcher.toBeNaN();
+
+		var result = lastResult();
+
+		expect(result.matcherName).toEqual("toBeNaN");
+		expect(result.passed()).toFail();
+		expect(result.message).toMatch("Expected 'a' to be NaN.");
+		expect(result.actual).toMatch(actual);
+	});
 
   it("toBeFalsy", function() {
     expect(match(false).toBeFalsy()).toPass();
@@ -776,7 +811,13 @@ describe("jasmine.Matchers", function() {
         TestClass.spyFunction('d', 'e', 'f');
         var expected = match(TestClass.spyFunction);
         expect(expected.toHaveBeenCalledWith('a', 'b')).toFail();
-        expect(lastResult().message).toEqual("Expected spy My spy to have been called with [ 'a', 'b' ] but was called with [ [ 'a', 'b', 'c' ], [ 'd', 'e', 'f' ] ]");
+        expect(lastResult().message).toEqual("Expected spy My spy to have been called with [ 'a', 'b' ] but actual calls were [ 'a', 'b', 'c' ], [ 'd', 'e', 'f' ]");
+      });
+
+      it("should return a decent message when it hasn't been called", function() {
+        var expected = match(TestClass.spyFunction);
+        expect(expected.toHaveBeenCalledWith('a', 'b')).toFail();
+        expect(lastResult().message).toEqual("Expected spy My spy to have been called with [ 'a', 'b' ] but it was never called.");
       });
 
       it("should return a decent message when inverted", function() {
@@ -784,7 +825,7 @@ describe("jasmine.Matchers", function() {
         TestClass.spyFunction('d', 'e', 'f');
         var expected = match(TestClass.spyFunction);
         expect(expected.not.toHaveBeenCalledWith('a', 'b', 'c')).toFail();
-        expect(lastResult().message).toEqual("Expected spy My spy not to have been called with [ 'a', 'b', 'c' ] but was called with [ [ 'a', 'b', 'c' ], [ 'd', 'e', 'f' ] ]");
+        expect(lastResult().message).toEqual("Expected spy My spy not to have been called with [ 'a', 'b', 'c' ] but it was.");
       });
 
       it('should throw an exception when invoked on a non-spy', shouldThrowAnExceptionWhenInvokedOnANonSpy('toHaveBeenCalledWith'));
