@@ -53,6 +53,7 @@
       var results = spec.results();
       var items = results.getItems();
       phantom.sendMessage('verbose',this.buffer + resultText);
+      phantom.sendMessage('writeln',this.buffer + resultText);
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
 

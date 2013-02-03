@@ -1,3 +1,7 @@
+# Customisations
+
+Extends [the forked repository](https://github.com/jasmine-contrib/grunt-jasmine-runner) with additional spec logging to stdout.
+
 # grunt-jasmine-runner
 
 Grunt task for running jasmine specs via phantomjs.
