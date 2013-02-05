@@ -22,7 +22,7 @@ var server = require('./lib/server'),
     phantomjs = require('./lib/phantomjs');
 
 var baseDir = '.',
-    generatedSpecRunnerFile = '_SpecRunner.html',
+    tmpRunner = '_SpecRunner.html',
     options,
     defaultOptions = {
       timeout : 10000,
@@ -30,7 +30,7 @@ var baseDir = '.',
       src     : [],
       helpers : [],
       template: {
-        src: __dirname + '/jasmine/SpecRunner.tmpl',
+        src: __dirname + '/../jasmine/SpecRunner.tmpl',
         opts: {}
       },
       phantomjs : {}
@@ -67,17 +67,19 @@ function task(grunt){
     grunt.warn('PhantomJS timed out, possibly due to an unfinished async spec.', 90);
   });
 
-  phantomjs.on('onResourceRequested', grunt.verbose.writeln.bind(grunt.verbose));
   phantomjs.on('console', console.log.bind(console));
   phantomjs.on('verbose', grunt.verbose.writeln.bind(grunt.verbose));
   phantomjs.on('debug', grunt.log.debug.bind(grunt.log, 'phantomjs'));
   phantomjs.on('write', grunt.log.write.bind(grunt.log));
   phantomjs.on('writeln', grunt.log.writeln.bind(grunt.log));
-  phantomjs.on('onError',function(string, trace){
+  phantomjs.on('onResourceRequested', grunt.verbose.writeln.bind(grunt.verbose));
+  phantomjs.on('pass', function(string) { grunt.log.writeln(string.green); });
+  phantomjs.on('fail', function(string) { grunt.log.writeln(string.red); });
+  phantomjs.on('onError', function(string, trace) {
     if (trace && trace.stack) {
-      console.log(trace.stack.red);
+      grunt.log.error(trace.stack.red);
     } else {
-      console.log(string.red);
+      grunt.log.error(string.red);
     }
   });
 
@@ -102,7 +104,7 @@ task.phantomRunner = function(options,cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(baseDir, generatedSpecRunnerFile)
+    pathname : path.join(baseDir,tmpRunner)
   });
 
   grunt.verbose.subhead('Testing jasmine specs via phantom').or.writeln('Testing jasmine specs via phantom');
@@ -124,7 +126,7 @@ task.interactiveRunner = function(options,cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(baseDir, generatedSpecRunnerFile)
+    pathname : path.join(baseDir,tmpRunner)
   });
 
   jasmine.createSpecRunnerPage(baseDir, options, []);

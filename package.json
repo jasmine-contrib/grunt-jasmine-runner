@@ -48,7 +48,7 @@
   "readmeFilename": "README.md",
   "_id": "grunt-jasmine-runner@0.6.1",
   "dist": {
-    "shasum": "408309d87c664d18c19028d2bb7a344579484d58"
+    "shasum": "f96652adf8723be3ae858bb368cb8a124955a765"
   },
   "_resolved": "git://github.com/MYOB-Technology/grunt-jasmine-runner.git#30de745dfe68a57eeefffbd6dc80907d9a083109",
   "_from": "grunt-jasmine-runner@git://github.com/MYOB-Technology/grunt-jasmine-runner.git"
