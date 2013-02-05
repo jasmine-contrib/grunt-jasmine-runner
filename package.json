@@ -32,7 +32,7 @@
     "test": "grunt test jasmine"
   },
   "dependencies": {
-    "grunt": "~0.3.15",
+    "grunt": ">= 0.3.17",
     "connect": "2.4.4",
     "temporary": "~0.0.2",
     "semver": "1.0.14",

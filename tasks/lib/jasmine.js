@@ -17,10 +17,10 @@ var mandatoryHelpers = [
 
 var mandatoryStyles = [ __dirname + '/../../jasmine/lib/jasmine-core/jasmine.css' ];
 
-exports.createSpecRunnerPage = function(dir, options, reporters) {
+exports.createSpecRunnerPage = function(options, reporters) {
   grunt.verbose.write('Creating Spec Runner Page...');
   var source;
-  grunt.file.copy(templateHashFrom(options).src, path.join(dir, generatedRunnerFile), {
+  grunt.file.copy(templateHashFrom(options).src, path.join(options.runner_dir, generatedRunnerFile), {
     process : function(src) {
       source = grunt.util._.template(src, createTemplateOptions(options, reporters));
       return source;
@@ -30,8 +30,8 @@ exports.createSpecRunnerPage = function(dir, options, reporters) {
 };
 
 function createTemplateOptions(options, reporters) {
-  var scriptOptions = (options.amd) ? createAmdScriptOptions(options, reporters) :
-                                      createNonAmdScriptOptions(options, reporters);
+  var scriptOptions = (typeof options.amd === 'undefined') ? createNonAmdScriptOptions(options, reporters) :
+                                                             createAmdScriptOptions(options, reporters);
   var templateOptions = grunt.util._.extend({ css : toRelativeFiles(mandatoryStyles) },
                                             scriptOptions, templateHashFrom(options).opts);
   grunt.verbose.write('Effective template options: ' + JSON.stringify(templateOptions));
@@ -62,11 +62,15 @@ function createNonAmdScriptOptions(options, reporters) {
 };
 
 function templateHashFrom(options) {
-  return typeof options.template === 'string' ? {
-    src: options.template,
-    opts: {}
-  } : options.template;
+  return {
+    src: resolveTemplateSrc(options),
+    opts: options.opts
+  };
 };
+
+function resolveTemplateSrc(options) {
+  return (typeof options.template === 'string') ? options.template : options.template.src;
+}
 
 function toRelativeFiles(/* args... */) {
   var list = Array.prototype.slice.call(arguments);
