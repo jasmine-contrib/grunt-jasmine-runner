@@ -22,7 +22,7 @@ var server = require('./lib/server'),
     phantomjs = require('./lib/phantomjs');
 
 var baseDir = '.',
-    tmpRunner = '_SpecRunner.html',
+    generatedSpecRunnerFile = '_SpecRunner.html',
     options,
     defaultOptions = {
       timeout : 10000,
@@ -30,7 +30,7 @@ var baseDir = '.',
       src     : [],
       helpers : [],
       template: {
-        src: __dirname + '/../jasmine/SpecRunner.tmpl',
+        src: __dirname + '/jasmine/SpecRunner.tmpl',
         opts: {}
       },
       phantomjs : {}
@@ -102,7 +102,7 @@ task.phantomRunner = function(options,cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(baseDir,tmpRunner)
+    pathname : path.join(baseDir, generatedSpecRunnerFile)
   });
 
   grunt.verbose.subhead('Testing jasmine specs via phantom').or.writeln('Testing jasmine specs via phantom');
@@ -124,7 +124,7 @@ task.interactiveRunner = function(options,cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(baseDir,tmpRunner)
+    pathname : path.join(baseDir, generatedSpecRunnerFile)
   });
 
   jasmine.createSpecRunnerPage(baseDir, options, []);
