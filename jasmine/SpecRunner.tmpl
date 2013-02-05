@@ -5,28 +5,34 @@
     <title>Jasmine Spec Runner</title>
 
     <% css.forEach(function(style){ %>
-    <link rel="stylesheet" type="text/css" href="<%= style %>">
+        <link rel="stylesheet" type="text/css" href="<%= style %>">
     <% }) %>
 
-<!--
-    <script type="text/javascript" src="/jasmine/lib/jasmine-core/jasmine.js"></script>
-    <script type="text/javascript" src="/jasmine/lib/jasmine-core/jasmine-html.js"></script>
--->
     <% scripts.forEach(function(script){ %>
-    <script type="text/javascript" src="<%= script %>"></script>
+        <script type="text/javascript" src="<%= script %>"></script>
     <% }) %>
 
-    <% if (typeof specs !== 'undefined') { %>
+    <% if (typeof amd != 'undefined') { %>
+
+        <script type="text/javascript" src="<%= amd.lib_script %>" data-main="<%= amd.main_script %>"></script>
+
         <script type="text/javascript">
         require([
-        <% specs.forEach(function(script, i){ %>
-            '<%= script %>' <% if (i !== specs.length-1){ %>,<% } %>
+        <% amd.specs.forEach(function(spec, i) { %>
+            '<%= spec %>' <% if (i !== amd.specs.length - 1) { %>,<% } %>
         <% }) %>
-        ]);
+        ], function() { executeJasmine(); });
         </script>
-    <% } %>
-</head>
 
+    <% } else { %>
+
+        <script type="text/javascript">
+            executeJasmine();
+        </script>
+
+    <% } %>
+
+</head>
 <body>
 </body>
 </html>

@@ -84,14 +84,6 @@
   };
 
   page.onError = function(msg, trace) {
-    /*
-     sendMessage(['error',msg]);
-     var buffer = '';
-     trace.forEach(function(line){
-     buffer += ' > ' + line.file + ':' + line.line + (line.function ? 'in ' + line.function + '()' : '') + "\n";
-     });
-     sendMessage(['error',buffer]);
-     */
     sendMessage('onError', msg, trace);
   };
 
@@ -103,8 +95,7 @@
     sendMessage('onLoadFinished', status);
     if (status === 'success') {
       if (options.inject && !injected) {
-        // Inject client-side helper script, but only if it has not yet been
-        // injected.
+        // Inject client-side helper script, but only if it has not yet been injected.
         options.inject.forEach(function(file){
           sendMessage('inject', file);
           page.injectJs(file);

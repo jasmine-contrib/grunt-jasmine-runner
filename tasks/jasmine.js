@@ -67,8 +67,9 @@ function task(grunt){
     grunt.warn('PhantomJS timed out, possibly due to an unfinished async spec.', 90);
   });
 
-  phantomjs.on('console',console.log.bind(console));
-  phantomjs.on('verbose',grunt.verbose.writeln.bind(grunt.verbose));
+  phantomjs.on('onResourceRequested', grunt.verbose.writeln.bind(grunt.verbose));
+  phantomjs.on('console', console.log.bind(console));
+  phantomjs.on('verbose', grunt.verbose.writeln.bind(grunt.verbose));
   phantomjs.on('debug', grunt.log.debug.bind(grunt.log, 'phantomjs'));
   phantomjs.on('write', grunt.log.write.bind(grunt.log));
   phantomjs.on('writeln', grunt.log.writeln.bind(grunt.log));
@@ -105,7 +106,7 @@ task.phantomRunner = function(options,cb){
   });
 
   grunt.verbose.subhead('Testing jasmine specs via phantom').or.writeln('Testing jasmine specs via phantom');
-  jasmine.buildSpecrunner(baseDir, options, phantomReporters);
+  jasmine.createSpecRunnerPage(baseDir, options, phantomReporters);
   var server = startServer(baseDir, port);
 
   runPhantom(url,options,phantomReporters.length,function(err,status){
@@ -126,7 +127,7 @@ task.interactiveRunner = function(options,cb){
     pathname : path.join(baseDir,tmpRunner)
   });
 
-  jasmine.buildSpecrunner(baseDir, options, []);
+  jasmine.createSpecRunnerPage(baseDir, options, []);
   startServer(baseDir, port);
   grunt.log.writeln('Run your tests at ' + url);
 
@@ -208,7 +209,3 @@ function setupTestListeners(options,numReporters, doneCallback) {
     grunt.warn('PhantomJS unable to load "' + url + '" URI.', 90);
   });
 }
-
-
-
-
