@@ -114,7 +114,6 @@
     } else {
       // File loading failure.
       sendMessage('fail.load', url);
-      phantom.exit();
     }
   };
   page.open(url);
