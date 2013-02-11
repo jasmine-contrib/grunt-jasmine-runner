@@ -31,7 +31,12 @@
       this.log("Runner Finished.");
       phantom.sendMessage('writeln', spec_str + fail_str + (dur/1000) + "s.");
       this.finished = true;
-      phantom.sendMessage( 'jasmine.done.ConsoleReporter' );
+
+      if (typeof window.__coverage__ == 'undefined') {
+        window.__coverage__ = {};
+      }
+
+      phantom.sendMessage( 'jasmine.done.ConsoleReporter', __coverage__);
     },
     reportRunnerStarting: function(runner) {
       this.started = true;

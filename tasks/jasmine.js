@@ -80,6 +80,11 @@ function task(grunt){
     }
   });
 
+  phantomjs.on('jasmine.done.ConsoleReporter', function (coverage) {  
+    grunt.verbose.writeln('jasmine.done.ConsoleReporter: ' + JSON.stringify(coverage));
+    global.__coverage__ = coverage;
+  });
+
   phantomjs.on('jasmine.*', function() {
     //var args = [this.event].concat(grunt.util.toArray(arguments));
     // grunt 0.4.0
