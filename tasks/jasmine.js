@@ -22,7 +22,7 @@ var server = require('./lib/server'),
     phantomjs = require('./lib/phantomjs');
 
 var baseDir = '.',
-    generatedRunnerFile = '_SpecRunner.html',
+    generatedRunnerFilename = '_SpecRunner.html',
     options,
     defaultOptions = {
       timeout    : 10000,
@@ -30,10 +30,10 @@ var baseDir = '.',
       src        : [],
       helpers    : [],
       template   : {
-        src: __dirname + '/jasmine/templates/SpecRunner.tmpl',
+        src: __dirname + '/jasmine/SpecRunner.html.tmpl',
         opts: {}
       },
-      runner_dir : baseDir,
+      'runner-dir' : baseDir,
       phantomjs  : {}
 };
 
@@ -92,7 +92,7 @@ function task(grunt){
 }
 
 
-task.phantomRunner = function(options, cb){
+task.phantomRunner = function(options, cb) {
   options = grunt.util._.extend({}, defaultOptions, options);
 
   var phantomReporters = [
@@ -105,20 +105,20 @@ task.phantomRunner = function(options, cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(options.runner_dir, generatedRunnerFile)
+    pathname : path.join(options['runner-dir'], generatedRunnerFilename)
   });
 
   grunt.verbose.subhead('Testing jasmine specs via phantom').or.writeln('Testing jasmine specs via phantom');
   jasmine.createSpecRunnerPage(options, phantomReporters);
   var server = startServer(baseDir, port);
 
-  runPhantom(url, options, phantomReporters.length, function(err,status) {
+  runPhantom(url, options, phantomReporters.length, function(err, status) {
     server.close();
     if (typeof cb === 'function') cb(err,status);
   });
 };
 
-task.interactiveRunner = function(options,cb){
+task.interactiveRunner = function(options, cb) {
   options = grunt.util._.extend({}, defaultOptions, options);
 
   var port = (options.server && options.server.port) || 8888;
@@ -127,7 +127,7 @@ task.interactiveRunner = function(options,cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(options.runner_dir, generatedRunnerFile)
+    pathname : path.join(options['runner-dir'], generatedRunnerFilename)
   });
 
   jasmine.createSpecRunnerPage(options, []);

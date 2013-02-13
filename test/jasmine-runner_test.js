@@ -1,6 +1,3 @@
-var grunt = require('grunt'),
-fs = require('fs');
-
 /*
   ======== A Handy Little Nodeunit Reference ========
   https://github.com/caolan/nodeunit
@@ -21,27 +18,32 @@ fs = require('fs');
     test.ifError(value)
 */
 
+var grunt = require('grunt'),
+    fs = require('fs');
+
 var task = require('../tasks/jasmine');
 
 exports['jasmine-runner'] = {
+
   setUp: function(done) {
     // setup here
     done();
   },
+
   'dynamic generation': function(test) {
     test.expect(4);
     // tests here
 
     var config = {
       timeout: 10000,
-      src     : 'jasmine/lib/jasmine-core/example/src/**/*.js',
-      helpers : 'jasmine/lib/jasmine-core/example/**/*Helper.js',
-      specs   : ['jasmine/lib/jasmine-core/example/**/*Spec.js'], // array to test support
+      src     : 'test/fixtures/selfContained/src/**/*.js',
+      helpers : 'test/fixtures/selfContained/spec/**/*Helper.js',
+      specs   : ['test/fixtures/selfContained/spec/**/*Spec.js'], // array to test support
       server  : {
         port : 8888
       },
       junit : {
-        output : 'junit'
+        output : 'build/results'
       },
       phantomjs : {
         'ignore-ssl-errors' : true,
@@ -50,25 +52,27 @@ exports['jasmine-runner'] = {
       }
     };
 
-    function cb(err,status){
+    function testCallback(err, status) {
       test.equal(status.specs, 5, 'Found total specs from example');
       test.equal(status.total, 8, 'Ran all specs from example');
       test.equal(status.passed, 8, 'Passed all specs from example');
       test.ok(!err, 'No error received');
+
       test.done();
     }
 
-    task.phantomRunner(config, cb);
+    task.phantomRunner(config, testCallback);
   },
+
   'custom template': function(test) {
     test.expect(5);
     // tests here
 
     var config = {
       timeout: 10000,
-      src     : 'jasmine/lib/jasmine-core/example/src/**/*.js',
-      helpers : 'jasmine/lib/jasmine-core/example/**/*Helper.js',
-      specs   : ['jasmine/lib/jasmine-core/example/**/*Spec.js'], // array to test support
+      src     : 'test/fixtures/selfContained/src/**/*.js',
+      helpers : 'test/fixtures/selfContained/spec/**/*Helper.js',
+      specs   : ['test/fixtures/selfContained/spec/**/*Spec.js'], // array to test support
       server  : {
         port : 8888
       },
@@ -78,8 +82,8 @@ exports['jasmine-runner'] = {
           title: 'foo'
         }
       },
-      junit : {
-        output : 'junit'
+      junit: {
+        output: 'build/results/custom-template'
       },
       phantomjs : {
         'ignore-ssl-errors' : true,
@@ -88,19 +92,56 @@ exports['jasmine-runner'] = {
       }
     };
 
-    function cb(err,status){
+    function testCallback(err, status) {
       test.equal(status.specs, 5, 'Found total specs from example');
       test.equal(status.total, 8, 'Ran all specs from example');
       test.equal(status.passed, 8, 'Passed all specs from example');
       test.ok(!err, 'No error received');
 
-      var actual = grunt.file.read('_SpecRunner.html'),
-      expected = grunt.file.read('test/expected/customTemplate/_SpecRunner.html');
-
+      var actual = grunt.file.read('_SpecRunner.html');
+      var expected = grunt.file.read('test/expected/customTemplate/_SpecRunner.html');
       test.equal(expected, actual, 'generated spec runner with custom template');
+
       test.done();
     }
 
-    task.phantomRunner(config, cb);
+    task.phantomRunner(config, testCallback);
+  },
+
+  'custom runner directory': function(test) {
+    test.expect(5);
+    // tests here
+
+    var config = {
+      timeout: 10000,
+      src     : 'test/fixtures/selfContained/src/**/*.js',
+      helpers : 'test/fixtures/selfContained/spec/**/*Helper.js',
+      specs   : 'test/fixtures/selfContained/spec/**/*Spec.js',
+      server  : {
+        port : 8888
+      },
+      'runner-dir' : 'build',
+      phantomjs : {
+        'ignore-ssl-errors' : true,
+        'local-to-remote-url-access' : true,
+        'web-security' : false
+      }
+    };
+
+    function testCallback(err, status) {
+      test.equal(status.specs, 5, 'Found total specs from example');
+      test.equal(status.total, 8, 'Ran all specs from example');
+      test.equal(status.passed, 8, 'Passed all specs from example');
+      test.ok(!err, 'No error received');
+
+      var actual = grunt.file.read('build/_SpecRunner.html');
+      var expected = grunt.file.read('test/expected/standardTemplate/_SpecRunner.html');
+      test.equal(expected, actual, 'generated spec runner with standard template');
+
+      test.done();
+    }
+
+    task.phantomRunner(config, testCallback);
   }
+
 };
