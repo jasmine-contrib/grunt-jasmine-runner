@@ -1,28 +1,28 @@
 {
-  "name"            : "grunt-jasmine-runner",
-  "description"     : "Grunt task for running Jasmine specs",
-  "version"         : "0.6.1",
-  "homepage"        : "https://github.com/jasmine-contrib/grunt-jasmine-runner",
+  "name"            : "grunt-jasmine-coverage",
+  "description"     : "Grunt task for running Jasmine specs and generate test coverage",
+  "version"         : "0.1.0",
+  "homepage"        : "https://github.com/mebusw/grunt-jasmine-coverage",
   "author"          : {
-    "name"  : "Jarrod Overson",
-    "email" : "jsoverson@gmail.com",
-    "url"   : "http://jarrodoverson.com/"
+    "name"  : "mebusw",
+    "email" : "mebusw@163.com",
+    "url"   : "http://blog.csdn.net/mebusw"
   },
   "repository"      : {
     "type" : "git",
-    "url"  : "git://github.com/jasmine-contrib/grunt-jasmine-runner.git"
+    "url"  : "git://github.com/mebusw/grunt-jasmine-coverage.git"
   },
   "bugs"            : {
-    "url" : "https://github.com/jasmine-contrib/grunt-jasmine-runner/issues"
+    "url" : "https://github.com/mebusw/grunt-jasmine-coverage/issues"
   },
   "licenses"        : [
     {
       "type" : "MIT",
-      "url"  : "https://github.com/jasmine-contrib/grunt-jasmine-runner/blob/master/LICENSE-MIT"
+      "url"  : "https://github.com/mebusw/grunt-jasmine-coverage/blob/master/LICENSE-MIT"
     }
   ],
   "main"            : "grunt.js",
-  "bin"             : "bin/grunt-jasmine-runner",
+  "bin"             : "bin/grunt-jasmine-coverage",
   "engines"         : {
     "node" : "*"
   },
@@ -35,11 +35,14 @@
     "temporary"     : "~0.0.2",
     "semver"        : "1.0.14",
     "eventemitter2" : "0.4.9",
-    "open"          : "0.0.2"
+    "open"          : "0.0.2",
+    "grunt-istanbul": "0.0.1"
   },
   "keywords"        : [
     "gruntplugin",
     "jasmine",
-    "phantomjs"
+    "istanbul",
+    "phantomjs",
+    "coverage"
   ]
 }
