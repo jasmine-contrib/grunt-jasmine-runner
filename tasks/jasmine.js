@@ -13,8 +13,11 @@ var fs = require('fs'),
     path = require('path'),
     URL = require('url'),
     sysopen = require('open'),
-    grunt = require('grunt'),
-    istanbul = require('grunt-istanbul');
+    grunt = require('grunt');
+var flow = require('nue').flow;
+var as = require('nue').as;
+var istanbul = require('istanbul');
+var helpers = require('grunt-contrib-lib').init(grunt);
 
 grunt.util = grunt.utils;
 
@@ -39,6 +42,7 @@ var baseDir = '.',
 
 module.exports = task;
 
+
 function task(grunt){
   phantomjs = phantomjs.init(grunt);
   grunt.util = grunt.utils;
@@ -58,19 +62,53 @@ function task(grunt){
 
   });
 
-  grunt.registerTask('jasmine-coverage', 'Run jasmine specs headlessly through PhantomJS and generate test coverage report.', function() {
-    options = grunt.config('jasmine');
+  grunt.registerTask('jasmine-coverage', 'Run jasmine specs headlessly through PhantomJS and generate test coverage report.', 
+    function(countryCode) {
 
-    var done = this.async();
+    //TODO: exclude files which no need to instrument
+    /*
+    var files = grunt.file.match(patterns, filepaths);
 
-    task.phantomRunner(options, function(err,status) {
-      if (status && status.failed > 0) {
-        grunt.log.error(grunt.util._("%s of %s total specs failed").sprintf(status.failed, status.total));
-      }
-      if (err) grunt.log.error(err);
-      done(!err && status.failed === 0);
+    var excludes = grunt.file.expandFiles(options.cobertura.excludes);
+    var src = options.src;
+    var srcToInstrument = src.map(function() {
+      return;
     });
+    console.warn(srcToInstrument);
+    */
 
+
+    grunt.task.loadTasks('node_modules/grunt-jasmine-coverage/node_modules/grunt-istanbul/tasks');
+
+
+    var config = grunt.config('jasmine');
+
+
+    grunt.config('instrument', {files: config.src});
+    console.warn(grunt.config('instrument'));
+
+    var coveragePath = grunt.config('meta').coverage;
+    var files = config.src.map(function(file){
+        return coveragePath + file;
+    });
+    config.src = files;
+    console.warn(config.src);
+
+    var config = grunt.config('copy');
+    config.non_coverage_libs = {
+        files : {
+        }
+    }
+    config.non_coverage_libs.files[coveragePath + "app/libs/"] = "app/libs/**/*";
+    grunt.task.run('copy');
+
+
+
+
+    grunt.task.run('instrument');
+    grunt.task.run('jasmine-server');
+    grunt.task.run('storeCoverage');
+    grunt.task.run('makeReport');
   });
 
   grunt.registerTask('jasmine-server', 'Run jasmine specs headlessly through PhantomJS.', function() {
@@ -106,7 +144,50 @@ function task(grunt){
     // grunt 0.4.0
     // grunt.event.emit.apply(grunt.event, args);
   });
+
+    // ==========================================================================
+  // HELPERS
+  // ==========================================================================
+  function flowEnd(err, done) {
+    if (err) {
+      grunt.fail.fatal(err);
+    } else {
+      grunt.log.ok();
+    }
+    done();
+  }
+
+  grunt.registerHelper('instrument', function(files, options, done) {
+    var instFlow = flow(function readFile(file) {
+      fs.readFile(file, 'utf8', this.async({
+        name : file,
+        code : as(1)
+      }));
+    }, function instrument(f) {
+      grunt.verbose.writeln('instrument from ' + f.name);
+      var instrumenter = new istanbul.Instrumenter(options);
+      instrumenter.instrument(f.code, f.name, this.async({
+        name : f.name,
+        code : as(1)
+      }));
+    }, function write(result) {
+      var out = path.join(options.basePath, options.flatten === true ? path
+          .basename(result.name) : result.name);
+      grunt.verbose.writeln('instrument to ' + out);
+      grunt.file.mkdir(path.dirname(out));
+      fs.writeFile(out, result.code, 'utf8', this.async(as(1)));
+    }, function end() {
+      flowEnd(this.err, this.next.bind(this));
+    });
+
+    flow(function(filelist) {
+      this.asyncEach(filelist, function(file, group) {
+        this.exec(instFlow, file, group.async(as(1)));
+      });
+    }, done)(files);
+  });
 }
+
 
 
 task.phantomRunner = function(options,cb){
