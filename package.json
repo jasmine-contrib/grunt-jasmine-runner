@@ -36,11 +36,12 @@
     "semver"        : "1.0.14",
     "eventemitter2" : "0.4.9",
     "open"          : "0.0.2",
-    "grunt-istanbul": "1.0.0"
+    "grunt-istanbul": "0.0.1"
   },
   "keywords"        : [
     "gruntplugin",
     "jasmine",
+    "istanbul",
     "phantomjs",
     "coverage"
   ]

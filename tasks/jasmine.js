@@ -13,7 +13,8 @@ var fs = require('fs'),
     path = require('path'),
     URL = require('url'),
     sysopen = require('open'),
-    grunt = require('grunt');
+    grunt = require('grunt'),
+    istanbul = require('grunt-istanbul');
 
 grunt.util = grunt.utils;
 
@@ -43,6 +44,21 @@ function task(grunt){
   grunt.util = grunt.utils;
 
   grunt.registerTask('jasmine', 'Run jasmine specs headlessly through PhantomJS.', function() {
+    options = grunt.config('jasmine');
+
+    var done = this.async();
+
+    task.phantomRunner(options, function(err,status) {
+      if (status && status.failed > 0) {
+        grunt.log.error(grunt.util._("%s of %s total specs failed").sprintf(status.failed, status.total));
+      }
+      if (err) grunt.log.error(err);
+      done(!err && status.failed === 0);
+    });
+
+  });
+
+  grunt.registerTask('jasmine-coverage', 'Run jasmine specs headlessly through PhantomJS and generate test coverage report.', function() {
     options = grunt.config('jasmine');
 
     var done = this.async();
