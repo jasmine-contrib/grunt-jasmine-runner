@@ -1,8 +1,8 @@
-# grunt-jasmine-runner
+# grunt-jasmine-coverage
 
 Grunt task for running jasmine specs via phantomjs.
 
-[![Build Status](https://secure.travis-ci.org/jsoverson/grunt-jasmine-runner.png)](http://travis-ci.org/jsoverson/grunt-jasmine-runner)
+[![Build Status](https://secure.travis-ci.org/mebusw/grunt-jasmine-coverage.png)](http://travis-ci.org/mebusw/grunt-jasmine-coverage)
 
 ## Getting Started
 
