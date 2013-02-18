@@ -1,3 +1,8 @@
+
+# THIS TASK IS NO LONGER SUPPORTED
+
+This task does not work with the current stable grunt (0.4.0) and has been replaced by [grunt-contrib-jasmine](https://github.com/gruntjs/grunt-contrib-jasmine)
+
 # grunt-jasmine-runner
 
 Grunt task for running jasmine specs via phantomjs.
