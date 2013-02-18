@@ -14,10 +14,7 @@ var fs = require('fs'),
     URL = require('url'),
     sysopen = require('open'),
     grunt = require('grunt');
-var flow = require('nue').flow;
-var as = require('nue').as;
-var istanbul = require('istanbul');
-var helpers = require('grunt-contrib-lib').init(grunt);
+
 
 grunt.util = grunt.utils;
 
