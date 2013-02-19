@@ -22,18 +22,19 @@ var server = require('./lib/server'),
     phantomjs = require('./lib/phantomjs');
 
 var baseDir = '.',
-    tmpRunner = '_SpecRunner.html',
+    generatedRunnerFilename = '_SpecRunner.html',
     options,
     defaultOptions = {
-      timeout : 10000,
-      specs   : [],
-      src     : [],
-      helpers : [],
-      template: {
-        src: __dirname + '/../jasmine/SpecRunner.tmpl',
+      timeout    : 10000,
+      specs      : [],
+      src        : [],
+      helpers    : [],
+      template   : {
+        src: __dirname + '/jasmine/SpecRunner.html.tmpl',
         opts: {}
       },
-      phantomjs : {}
+      'runner-dir' : baseDir,
+      phantomjs  : {}
 };
 
 module.exports = task;
@@ -67,16 +68,19 @@ function task(grunt){
     grunt.warn('PhantomJS timed out, possibly due to an unfinished async spec.', 90);
   });
 
-  phantomjs.on('console',console.log.bind(console));
-  phantomjs.on('verbose',grunt.verbose.writeln.bind(grunt.verbose));
+  phantomjs.on('console', console.log.bind(console));
+  phantomjs.on('verbose', grunt.verbose.writeln.bind(grunt.verbose));
   phantomjs.on('debug', grunt.log.debug.bind(grunt.log, 'phantomjs'));
   phantomjs.on('write', grunt.log.write.bind(grunt.log));
   phantomjs.on('writeln', grunt.log.writeln.bind(grunt.log));
-  phantomjs.on('onError',function(string, trace){
+  phantomjs.on('onResourceRequested', grunt.verbose.writeln.bind(grunt.verbose));
+  phantomjs.on('pass', function(string) { grunt.log.writeln(string.green); });
+  phantomjs.on('fail', function(string) { grunt.log.writeln(string.red); });
+  phantomjs.on('onError', function(string, trace) {
     if (trace && trace.stack) {
-      console.log(trace.stack.red);
+      grunt.log.error(trace.stack.red);
     } else {
-      console.log(string.red);
+      grunt.log.error(string.red);
     }
   });
 
@@ -88,8 +92,8 @@ function task(grunt){
 }
 
 
-task.phantomRunner = function(options,cb){
-  options = grunt.util._.extend({},defaultOptions,options);
+task.phantomRunner = function(options, cb) {
+  options = grunt.util._.extend({}, defaultOptions, options);
 
   var phantomReporters = [
       __dirname + '/jasmine/reporters/ConsoleReporter.js',
@@ -101,21 +105,21 @@ task.phantomRunner = function(options,cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(baseDir,tmpRunner)
+    pathname : path.join(options['runner-dir'], generatedRunnerFilename)
   });
 
   grunt.verbose.subhead('Testing jasmine specs via phantom').or.writeln('Testing jasmine specs via phantom');
-  jasmine.buildSpecrunner(baseDir, options, phantomReporters);
+  jasmine.createSpecRunnerPage(options, phantomReporters);
   var server = startServer(baseDir, port);
 
-  runPhantom(url,options,phantomReporters.length,function(err,status){
+  runPhantom(url, options, phantomReporters.length, function(err, status) {
     server.close();
     if (typeof cb === 'function') cb(err,status);
   });
 };
 
-task.interactiveRunner = function(options,cb){
-  options = grunt.util._.extend({},defaultOptions,options);
+task.interactiveRunner = function(options, cb) {
+  options = grunt.util._.extend({}, defaultOptions, options);
 
   var port = (options.server && options.server.port) || 8888;
 
@@ -123,10 +127,10 @@ task.interactiveRunner = function(options,cb){
     protocol : 'http',
     hostname : '127.0.0.1',
     port : port + '',
-    pathname : path.join(baseDir,tmpRunner)
+    pathname : path.join(options['runner-dir'], generatedRunnerFilename)
   });
 
-  jasmine.buildSpecrunner(baseDir, options, []);
+  jasmine.createSpecRunnerPage(options, []);
   startServer(baseDir, port);
   grunt.log.writeln('Run your tests at ' + url);
 
@@ -150,7 +154,7 @@ function runPhantom(url,options,numReporters, cb) {
     failCode : 90,
     options  : options,
     done     : function(err){
-      cb(err,status);
+      cb(err, status);
     }
   });
 }
@@ -208,7 +212,3 @@ function setupTestListeners(options,numReporters, doneCallback) {
     grunt.warn('PhantomJS unable to load "' + url + '" URI.', 90);
   });
 }
-
-
-
-

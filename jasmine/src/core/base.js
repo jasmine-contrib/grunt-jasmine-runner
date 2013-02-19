@@ -1,4 +1,4 @@
-var isCommonJS = typeof window == "undefined";
+var isCommonJS = typeof window == "undefined" && typeof exports == "object";
 
 /**
  * Top level namespace for Jasmine, a lightweight JavaScript BDD/spec/testing framework.
@@ -33,6 +33,11 @@ jasmine.VERBOSE = false;
  *
  */
 jasmine.DEFAULT_UPDATE_INTERVAL = 250;
+
+/**
+ * Maximum levels of nesting that will be included when an object is pretty-printed
+ */
+jasmine.MAX_PRETTY_PRINT_DEPTH = 40;
 
 /**
  * Default timeout interval in milliseconds for waitsFor() blocks.
@@ -470,7 +475,7 @@ jasmine.log = function() {
  * @see jasmine.createSpy
  * @param obj
  * @param methodName
- * @returns a Jasmine spy that can be chained with all spy methods
+ * @return {jasmine.Spy} a Jasmine spy that can be chained with all spy methods
  */
 var spyOn = function(obj, methodName) {
   return jasmine.getEnv().currentSpec.spyOn(obj, methodName);
@@ -515,6 +520,7 @@ if (isCommonJS) exports.xit = xit;
  * jasmine.Matchers functions.
  *
  * @param {Object} actual Actual value to test against and expected value
+ * @return {jasmine.Matchers}
  */
 var expect = function(actual) {
   return jasmine.getEnv().currentSpec.expect(actual);

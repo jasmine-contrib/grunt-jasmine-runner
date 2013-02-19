@@ -1,0 +1,5 @@
+require([
+<% specs.forEach(function(spec, i) { %>
+    '<%= spec %>'<% if (i !== specs.length - 1) { %>,<% } %>
+<% }) %>
+], function() { executeJasmine(); });

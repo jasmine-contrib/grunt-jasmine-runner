@@ -1,4 +1,5 @@
-node_modules
-_tmp
 .idea
+_tmp
+build
 junit
+node_modules

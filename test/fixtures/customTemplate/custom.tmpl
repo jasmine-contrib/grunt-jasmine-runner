@@ -4,11 +4,11 @@
 		<title><%= title %></title>
 	</head>
 	<body>
-		<% css.forEach(function(style){ %>
+		<% css.forEach(function(style) { %>
 			<link rel="stylesheet" type="text/css" href="<%= style %>">
 		<% }) %>
 
-		<% scripts.forEach(function(script){ %>
+		<% scripts.forEach(function(script) { %>
 			<script type="text/javascript" src="<%= script %>"></script>
 		<% }) %>
 	</body>

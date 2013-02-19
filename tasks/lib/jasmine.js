@@ -2,62 +2,86 @@
 var grunt = require('grunt'),
     path = require('path');
 
-var baseDir = '.';
-var tmpRunner = '_SpecRunner.html';
+var basePath = path.resolve('.');
+var generatedRunnerFilename = '_SpecRunner.html';
 
+var jasmineCoreScripts = [
+  __dirname + '/../../jasmine/lib/jasmine-core/jasmine.js',
+  __dirname + '/../../jasmine/lib/jasmine-core/jasmine-html.js'
+];
 
-exports.buildSpecrunner = function(dir, options, reporters){
-  var jasmineCss = [
-    __dirname + '/../../jasmine/lib/jasmine-core/jasmine.css'
-  ];
+var mandatoryHelpers = [
+  __dirname + '/../jasmine/phantom-helper.js',
+  __dirname + '/../jasmine/jasmine-helper.js'
+];
 
-  var jasmineCore = [
-    __dirname + '/../../jasmine/lib/jasmine-core/jasmine.js',
-    __dirname + '/../../jasmine/lib/jasmine-core/jasmine-html.js'
-  ];
+var nonAmdExecutor = __dirname + '/../jasmine/jasmine-executor.js'
+var amdExecutorTemplate = __dirname + '/../jasmine/amd/jasmine-executor.js.tmpl'
+var generatedAmdExecutorFilename = 'jasmine-executor.js';
 
-  var phantomHelper = __dirname + '/../jasmine/phantom-helper.js';
-  var jasmineHelper = __dirname + '/../jasmine/jasmine-helper.js';
+var mandatoryStyle = __dirname + '/../../jasmine/lib/jasmine-core/jasmine.css';
 
-  var styles = getRelativeFileList(jasmineCss);
-
-  if (options.amd) {
-    var specs = getRelativeFileList(options.specs);
-    var scripts = getRelativeFileList(jasmineCore, options.helpers, phantomHelper, reporters, jasmineHelper);
-  } else {
-    var scripts = getRelativeFileList(jasmineCore, options.src, options.helpers, options.specs, phantomHelper, reporters, jasmineHelper);
-  }
-
-  var specRunnerTemplate = typeof options.template === 'string' ? {
-    src: options.template,
-    opts: {}
-  } : options.template;
-
-  var source;
-  grunt.file.copy(specRunnerTemplate.src, path.join(dir,tmpRunner), {
+exports.createSpecRunnerPage = function(options, reporters) {
+  grunt.verbose.write('Creating Spec Runner Page...');
+  grunt.file.copy(resolveTemplateSrc(options), path.join(options['runner-dir'], generatedRunnerFilename), {
     process : function(src) {
-      source = grunt.util._.template(src, grunt.util._.extend({
-        scripts : scripts,
-        specs: specs,
-        css : styles
-      }, specRunnerTemplate.opts));
-      return source;
+      return grunt.util._.template(src, createTemplateOptions(options, reporters));
     }
   });
-  return source;
 };
 
+function createTemplateOptions(options, reporters) {
+  var scriptOptions = (typeof options.amd === 'undefined') ? createNonAmdScriptOptions(options, reporters) :
+                                                             createAmdScriptOptions(options, reporters);
+  return grunt.util._.extend({ css : toRelativeFiles(mandatoryStyle) }, scriptOptions, options.template.opts);
+};
 
-function getRelativeFileList(/* args... */) {
-  var list = Array.prototype.slice.call(arguments);
-  var base = path.resolve(baseDir);
-  var files = [];
-  list.forEach(function(listItem){
-    files = files.concat(grunt.file.expandFiles(listItem));
+function createNonAmdScriptOptions(options, reporters) {
+  grunt.verbose.write('Configuring Non-AMD support...');
+  var scriptOptions = {
+    scripts: toRelativeFiles(jasmineCoreScripts, options.src, mandatoryHelpers, nonAmdExecutor,
+                             options.helpers, reporters, options.specs)
+  };
+  grunt.verbose.ok();
+  return scriptOptions;
+};
+
+function createAmdScriptOptions(options, reporters) {
+  grunt.verbose.write('Configuring AMD support...');
+  var generatedAmdHelperScript = createAmdHelperScript(options);
+  var scriptOptions = {
+    scripts: toRelativeFiles(jasmineCoreScripts, mandatoryHelpers, reporters, options.amd.lib,
+                             options.amd.main, options.helpers, generatedAmdHelperScript),
+  };
+  grunt.verbose.ok();
+  return scriptOptions;
+};
+
+function createAmdHelperScript(options) {
+  var scriptLocation = path.join(options['runner-dir'], generatedAmdExecutorFilename);
+  grunt.file.copy(amdExecutorTemplate, scriptLocation, {
+    process : function(src) {
+      return grunt.util._.template(src, { specs: toRelativeFiles(options.specs) });
+    }
   });
-  files = grunt.util._(files).map(function(file){
-    return path.resolve(file).replace(base,'').replace(/\\/g,'/');
-  });
-  return files;
+  return scriptLocation;
+};
+
+function resolveTemplateSrc(options) {
+  return (typeof options.template === 'string') ? options.template : options.template.src;
 }
 
+function toRelativeFiles(/* args... */) {
+  var list = Array.prototype.slice.call(arguments);
+  var files = [];
+  list.forEach(function(listItem) {
+    files = files.concat(grunt.file.expandFiles(listItem));
+  });
+  return grunt.util._(files).map(function(file) {
+    return path.resolve(file).replace(basePath, '').replace(/\\/g, '/');
+  });
+};
+
+function toRelativeFile(file) {
+  return toRelativeFiles(file);
+};
