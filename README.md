@@ -1,11 +1,12 @@
 # grunt-jasmine-coverage
 
-Grunt task for running jasmine specs via phantomjs.
+Grunt task for running jasmine specs via phantomjs, and able to generate code coverage report.
 
-[![Build Status](https://travis-ci.org/mebusw/grunt-jasmine-coverage.png?branch=master)](https://travis-ci.org/mebusw/grunt-jasmine-coverage)
+**NOTE This plugin is compatible with grunt 0.3, but not grunt 0.4 !!!**
+
 ## Getting Started
 
-Install this grunt plugin next to your project's [grunt.js gruntfile][getting_started] with: `npm install grunt-jasmine-coverage`
+Install this grunt plugin next to your project's "grunt.js" or "Gruntfile", start with: `npm install grunt-jasmine-coverage`
 
 Then add this line to your project's `grunt.js` gruntfile:
 
@@ -29,7 +30,7 @@ grunt.loadNpmTasks('grunt-jasmine-coverage');
   - coverage :
      - output : The output directory for coverage report
      - reportType : Could be `lcov` or `cobertura`. Default is `lcov`.
-     - excludes : Any files to be excluded from instrument.
+     - excludes : Any files to be excluded from instrumenting.
 
 - jasmine-server
   - browser : Open user's default browser automatically? Default true
@@ -49,7 +50,7 @@ grunt.loadNpmTasks('grunt-jasmine-coverage');
   coverage : {
     output : 'junit/coverage/',
     reportType : 'cobertura',
-    excludes : [lib/**/*.js]    
+    excludes : ['lib/**/*.js']    
   },
   phantomjs : {
     'ignore-ssl-errors' : true
