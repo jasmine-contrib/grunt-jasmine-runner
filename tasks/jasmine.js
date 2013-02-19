@@ -62,49 +62,38 @@ function task(grunt){
   grunt.registerTask('jasmine-coverage', 'Run jasmine specs headlessly through PhantomJS and generate test coverage report.', 
     function(countryCode) {
 
-    //TODO: exclude files which no need to instrument
-    /*
-    var files = grunt.file.match(patterns, filepaths);
-
-    var excludes = grunt.file.expandFiles(options.cobertura.excludes);
-    var src = options.src;
-    var srcToInstrument = src.map(function() {
-      return;
-    });
-    console.warn(srcToInstrument);
-    */
-
-
     grunt.task.loadTasks('node_modules/grunt-jasmine-coverage/node_modules/grunt-istanbul/tasks');
     grunt.config.requires('jasmine.coverage');
     var config = grunt.config('jasmine');
 
-    //var filesToInstrument = grunt.file.expand(config.coverage.excludes, config.src);
-    var filesToInstrument = config.src;
+    var filesToInstrument = config.src.map(function(file) {
+      if (grunt.file.isMatch(config.coverage.excludes, file)) {
+        return '';
+      } else {
+        return file;
+      }
+    });
+    var filesNotToInstrument = config.src.map(function(file) {
+      if (grunt.file.isMatch(config.coverage.excludes, file)) {
+        return file;
+      } else {
+        return '';
+      }
+    });
+
     grunt.config('instrument', {
       files: filesToInstrument,
       options: {basePath: config.coverage.output}
     });
-    console.warn(grunt.config('instrument'));
     grunt.task.run('instrument');
 
-    var coveragePath = config.coverage.output;
-    console.warn(config.coverage);
-    var files = config.src.map(function(file){
-        return coveragePath + file;
-    });
-    config.src = files;
-    grunt.config('jasmine', config);
-    console.warn(grunt.config('jasmine'));
-    grunt.task.run('jasmine');
 
-    // var config = grunt.config('copy');
-    // config.non_coverage_libs = {
-    //     files : {
-    //     }
-    // }
-    // config.non_coverage_libs.files[coveragePath + "app/libs/"] = "app/libs/**/*";
-    // grunt.task.run('copy');
+    var files = filesToInstrument.map(function(file){
+        return config.coverage.output + file;
+    });
+    config.src = filesNotToInstrument.concat(files);
+    grunt.config('jasmine', config);
+    grunt.task.run('jasmine');
 
 
     grunt.config('storeCoverage', {
@@ -112,9 +101,10 @@ function task(grunt){
     });
     grunt.task.run('storeCoverage');
 
+    var reportType = config.coverage.reportType || 'lcov';
     grunt.config('makeReport', {
       src: config.coverage.output + '*.json',
-      options: {dir: config.coverage.output}
+      options: {dir: config.coverage.output, type: reportType}
     });
     grunt.task.run('makeReport');
   });

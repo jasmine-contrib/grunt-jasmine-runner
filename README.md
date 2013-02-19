@@ -28,7 +28,7 @@ grunt.loadNpmTasks('grunt-jasmine-coverage');
   - phantomjs : A hash of options to pass to phantomjs eg {'ignore-ssl-errors' : true}
   - coverage :
      - output : The output directory for coverage report
-     - reportType : Could be `lcov` or `cobertura`. Default is `cobertura`.
+     - reportType : Could be `lcov` or `cobertura`. Default is `lcov`.
      - excludes : Any files to be excluded from instrument.
 
 - jasmine-server
