@@ -76,35 +76,46 @@ function task(grunt){
 
 
     grunt.task.loadTasks('node_modules/grunt-jasmine-coverage/node_modules/grunt-istanbul/tasks');
-
-
+    grunt.config.requires('jasmine.coverage');
     var config = grunt.config('jasmine');
 
-
-    grunt.config('instrument', {files: config.src});
+    //var filesToInstrument = grunt.file.expand(config.coverage.excludes, config.src);
+    var filesToInstrument = config.src;
+    grunt.config('instrument', {
+      files: filesToInstrument,
+      options: {basePath: config.coverage.output}
+    });
     console.warn(grunt.config('instrument'));
+    grunt.task.run('instrument');
 
-    var coveragePath = grunt.config('meta').coverage;
+    var coveragePath = config.coverage.output;
+    console.warn(config.coverage);
     var files = config.src.map(function(file){
         return coveragePath + file;
     });
     config.src = files;
-    console.warn(config.src);
+    grunt.config('jasmine', config);
+    console.warn(grunt.config('jasmine'));
+    grunt.task.run('jasmine');
 
-    var config = grunt.config('copy');
-    config.non_coverage_libs = {
-        files : {
-        }
-    }
-    config.non_coverage_libs.files[coveragePath + "app/libs/"] = "app/libs/**/*";
-    grunt.task.run('copy');
+    // var config = grunt.config('copy');
+    // config.non_coverage_libs = {
+    //     files : {
+    //     }
+    // }
+    // config.non_coverage_libs.files[coveragePath + "app/libs/"] = "app/libs/**/*";
+    // grunt.task.run('copy');
 
 
-
-
-    grunt.task.run('instrument');
-    grunt.task.run('jasmine-server');
+    grunt.config('storeCoverage', {
+      options: {dir: config.coverage.output}
+    });
     grunt.task.run('storeCoverage');
+
+    grunt.config('makeReport', {
+      src: config.coverage.output + '*.json',
+      options: {dir: config.coverage.output}
+    });
     grunt.task.run('makeReport');
   });
 
