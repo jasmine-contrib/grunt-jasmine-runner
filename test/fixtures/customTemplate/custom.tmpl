@@ -1,15 +1,21 @@
 <!doctype html>
 <html>
-	<head>
-		<title><%= title %></title>
-	</head>
-	<body>
-		<% css.forEach(function(style){ %>
-			<link rel="stylesheet" type="text/css" href="<%= style %>">
-		<% }) %>
+    <head>
+        <title><%= title %></title>
+    </head>
+    <body>
+        <% css.forEach(function(style){ %>
+        <link rel="stylesheet" type="text/css" href="<%= style %>">
+        <% }) %>
 
-		<% scripts.forEach(function(script){ %>
-			<script type="text/javascript" src="<%= script %>"></script>
-		<% }) %>
-	</body>
+        <% core.concat(src).concat(specs).forEach(function(script){ %>
+        <script type="text/javascript" src="<%= script %>"></script>
+        <% }) %>
+
+        <script type="text/javascript">
+            window.onload = function() {
+                execJasmine();
+            };    
+        </script>
+    </body>
 </html>
