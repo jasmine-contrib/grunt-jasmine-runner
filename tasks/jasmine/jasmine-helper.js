@@ -26,5 +26,8 @@ window.onload = function() {
 };
 
 function execJasmine() {
-  jasmineEnv.execute();
+  setTimeout(function(){
+    jasmineEnv.execute();
+  }, 100);
 }
+
