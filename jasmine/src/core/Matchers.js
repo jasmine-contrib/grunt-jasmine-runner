@@ -151,6 +151,17 @@ jasmine.Matchers.prototype.toBeNull = function() {
 };
 
 /**
+ * Matcher that compares the actual to NaN.
+ */
+jasmine.Matchers.prototype.toBeNaN = function() {
+	this.message = function() {
+		return [ "Expected " + jasmine.pp(this.actual) + " to be NaN." ];
+	};
+
+	return (this.actual !== this.actual);
+};
+
+/**
  * Matcher that boolean not-nots the actual.
  */
 jasmine.Matchers.prototype.toBeTruthy = function() {
@@ -227,18 +238,14 @@ jasmine.Matchers.prototype.toHaveBeenCalledWith = function() {
     throw new Error('Expected a spy, but got ' + jasmine.pp(this.actual) + '.');
   }
   this.message = function() {
+    var invertedMessage = "Expected spy " + this.actual.identity + " not to have been called with " + jasmine.pp(expectedArgs) + " but it was.";
+    var positiveMessage = "";
     if (this.actual.callCount === 0) {
-      // todo: what should the failure message for .not.toHaveBeenCalledWith() be? is this right? test better. [xw]
-      return [
-        "Expected spy " + this.actual.identity + " to have been called with " + jasmine.pp(expectedArgs) + " but it was never called.",
-        "Expected spy " + this.actual.identity + " not to have been called with " + jasmine.pp(expectedArgs) + " but it was."
-      ];
+      positiveMessage = "Expected spy " + this.actual.identity + " to have been called with " + jasmine.pp(expectedArgs) + " but it was never called.";
     } else {
-      return [
-        "Expected spy " + this.actual.identity + " to have been called with " + jasmine.pp(expectedArgs) + " but was called with " + jasmine.pp(this.actual.argsForCall),
-        "Expected spy " + this.actual.identity + " not to have been called with " + jasmine.pp(expectedArgs) + " but was called with " + jasmine.pp(this.actual.argsForCall)
-      ];
+      positiveMessage = "Expected spy " + this.actual.identity + " to have been called with " + jasmine.pp(expectedArgs) + " but actual calls were " + jasmine.pp(this.actual.argsForCall).replace(/^\[ | \]$/g, '')
     }
+    return [positiveMessage, invertedMessage];
   };
 
   return this.env.contains_(this.actual.argsForCall, expectedArgs);
@@ -296,7 +303,7 @@ jasmine.Matchers.prototype.toBeGreaterThan = function(expected) {
  * up to a given level of decimal precision (default 2).
  *
  * @param {Number} expected
- * @param {Number} precision
+ * @param {Number} precision, as number of decimal places
  */
 jasmine.Matchers.prototype.toBeCloseTo = function(expected, precision) {
   if (!(precision === 0)) {
@@ -308,7 +315,7 @@ jasmine.Matchers.prototype.toBeCloseTo = function(expected, precision) {
 /**
  * Matcher that checks that the expected exception was thrown by the actual.
  *
- * @param {String} expected
+ * @param {String} [expected]
  */
 jasmine.Matchers.prototype.toThrow = function(expected) {
   var result = false;
