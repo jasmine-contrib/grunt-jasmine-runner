@@ -95,18 +95,18 @@ task.phantomRunner = function(options,cb){
       __dirname + '/jasmine/reporters/ConsoleReporter.js',
       __dirname + '/jasmine/reporters/JUnitReporter.js'
     ],
-    port = (options.server && options.server.port) || 8888;
-
-  var url = URL.format({
-    protocol : 'http',
-    hostname : '127.0.0.1',
-    port : port + '',
-    pathname : path.join(baseDir,tmpRunner)
-  });
+    port = (options.server && options.server.port) || 0;
 
   grunt.verbose.subhead('Testing jasmine specs via phantom').or.writeln('Testing jasmine specs via phantom');
   jasmine.buildSpecrunner(baseDir, options, phantomReporters);
   var server = startServer(baseDir, port);
+
+  var url = URL.format({
+    protocol : 'http',
+    hostname : '127.0.0.1',
+    port : server.address().port + '',
+    pathname : path.join(baseDir,tmpRunner)
+  });
 
   runPhantom(url,options,phantomReporters.length,function(err,status){
     server.close();
@@ -117,17 +117,18 @@ task.phantomRunner = function(options,cb){
 task.interactiveRunner = function(options,cb){
   options = grunt.util._.extend({},defaultOptions,options);
 
-  var port = (options.server && options.server.port) || 8888;
+  var port = (options.server && options.server.port) || 0;
+
+  jasmine.buildSpecrunner(baseDir, options, []);
+  var server = startServer(baseDir, port);
 
   var url = URL.format({
     protocol : 'http',
     hostname : '127.0.0.1',
-    port : port + '',
+    port : server.address().port + '',
     pathname : path.join(baseDir,tmpRunner)
   });
 
-  jasmine.buildSpecrunner(baseDir, options, []);
-  startServer(baseDir, port);
   grunt.log.writeln('Run your tests at ' + url);
 
   var serverSettings = grunt.config('jasmine-server') || {};
